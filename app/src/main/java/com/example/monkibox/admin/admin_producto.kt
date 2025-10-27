@@ -1,4 +1,5 @@
 package com.example.monkibox.admin
+import androidx.compose.foundation.background
 import com.example.monkibox.R
 import com.example.monkibox.ProductViewModel
 
@@ -21,12 +22,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialogDefaults.containerColor
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import coil.compose.AsyncImage
 import kotlin.random.Random
+
 
 // Usamos @OptIn para el Scaffold y TopAppBar
 @OptIn(ExperimentalMaterial3Api::class)
@@ -43,17 +46,24 @@ fun AdminProductsScreen(
     var showAddDialog by remember { mutableStateOf(false) }
 
     Scaffold(
+        containerColor = MonkiFondo,
         topBar = {
             TopAppBar(
-                title = { Text("Gestión de Productos") },
+                title = { Text("Gestión de Productos", color = MonkiCafe, fontWeight = FontWeight.SemiBold) },
                 navigationIcon = {
                     IconButton(onClick = { onBackClick() }) {
                         Icon(
                             imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Volver"
+                            contentDescription = "Volver",
+                            tint = MonkiCafe
                         )
                     }
-                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MonkiFondo,
+                    navigationIconContentColor = MonkiCafe,
+                    titleContentColor = MonkiCafe
+                )
             )
         }
     ) { paddingValues ->
@@ -61,26 +71,33 @@ fun AdminProductsScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(16.dp),
+                .padding(horizontal = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
-        ) {
+        ){
 
             Text(
                 text = "Número de productos totales",
-                style = MaterialTheme.typography.titleMedium
+                style = MaterialTheme.typography.titleMedium,
+                color = MonkiCafe,
+                modifier = Modifier.padding(top = 16.dp)
             )
             Text(
                 text = productList.size.toString(),
                 style = MaterialTheme.typography.displaySmall,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                color = MonkiCafe
             )
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // 2. BOTÓN "Registrar producto" (ACTUALIZADO)
+            // 2. BOTÓN "Registrar producto"
             Button(
                 onClick = { showAddDialog = true },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MonkiAmarillo,
+                    contentColor = MonkiCafe // Color del texto dentro del botón
+                )
             ) {
                 Text("Registrar producto")
             }
@@ -144,7 +161,8 @@ fun ProductListItem(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp) //sombra sutil
     ) {
         Row(
             modifier = Modifier
@@ -188,18 +206,24 @@ fun ProductListItem(
                 IconButton(onClick = { menuExpanded = true }) {
                     Icon(
                         imageVector = Icons.Default.MoreVert,
-                        contentDescription = "Opciones del producto"
+                        contentDescription = "Opciones del producto",
+                        tint = MonkiCafe
                     )
                 }
                 DropdownMenu(
                     expanded = menuExpanded,
-                    onDismissRequest = { menuExpanded = false }
+                    onDismissRequest = { menuExpanded = false },
+                    modifier = Modifier.background(MonkiFondo)
                 ) {
-                    DropdownMenuItem(text = { Text("Editar") }, onClick = {
+                    DropdownMenuItem(text = { Text("Editar", color = MonkiCafe) },
+                        onClick = {
                         onEditClick()
                         menuExpanded = false
                     })
-                    DropdownMenuItem(text = { Text("Eliminar") }, onClick = {
+                    Divider(color = MonkiCafe.copy(alpha = 0.5f))
+
+                    DropdownMenuItem(text = { Text("Eliminar", color = MonkiCafe) },
+                        onClick = {
                         onDeleteClick()
                         menuExpanded = false
                     })
@@ -210,7 +234,7 @@ fun ProductListItem(
 }
 
 
-// --- DIÁLOGO DE EDICIÓN (ACTUALIZADO) ---
+// --- DIÁLOGO DE EDICIÓN  ---
 
 @Composable
 fun EditProductDialog(
@@ -226,12 +250,13 @@ fun EditProductDialog(
     var imageUrl by remember { mutableStateOf(product.imageUrl) }
 
     Dialog(onDismissRequest = { onDismiss() }) {
-        Card(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
+        Card(modifier = Modifier.fillMaxWidth().padding(16.dp),
+            colors = CardDefaults.cardColors(containerColor = MonkiFondo)) {
             Column(
                 modifier = Modifier.padding(24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text("Editar Producto", style = MaterialTheme.typography.headlineSmall)
+                Text("Editar Producto", style = MaterialTheme.typography.headlineSmall, color = MonkiCafe)
                 Spacer(modifier = Modifier.height(16.dp))
 
                 // Campo URL (NUEVO)
@@ -293,17 +318,20 @@ fun EditProductDialog(
                             price = newPrice,
                             stock = newStock,
                             description = description,
-                            imageUrl = imageUrl // 5. GUARDAR el campo nuevo
+                            imageUrl = imageUrl, // 5. GUARDAR el campo nuevo
                         )
                         onConfirm(updatedProduct)
-                    }) { Text("Confirmar") }
+                    }, colors = ButtonDefaults.buttonColors(containerColor = MonkiAmarillo)
+                    ) {
+                        Text("Confirmar", color = MonkiCafe, fontWeight = FontWeight.Bold)
+                    }
 
                     Button(
                         onClick = { onDismiss() },
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.secondary
+                            containerColor = MonkiCafe
                         )
-                    ) { Text("Cerrar") }
+                    ) { Text("Cerrar", color = Color.White) }
                 }
             }
         }
@@ -397,12 +425,15 @@ fun AddProductDialog(
                             imageUrl = imageUrl
                         )
                         onConfirm(newProduct)
-                    }) { Text("Confirmar") }
+                    }, colors = ButtonDefaults.buttonColors(containerColor = MonkiAmarillo)
+                    ) {
+                        Text("Confirmar", color = MonkiCafe)
+                    }
 
                     Button(
                         onClick = { onDismiss() },
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.secondary
+                            containerColor = MonkiCafe
                         )
                     ) { Text("Cerrar") }
                 }
