@@ -1,125 +1,255 @@
 package com.example.monkibox.admin
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material3.DrawerValue
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.ModalDrawerSheet
-import androidx.compose.material3.ModalNavigationDrawer
-import androidx.compose.material3.NavigationDrawerItem
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.rememberDrawerState
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
+import com.example.monkibox.R
 
-// Usamos @OptIn para componentes que aún son "Experimentales" en Material 3
+// --- DEFINICIÓN DE COLORES DEL TEMA MONKIBOX ---
+val MonkiAmarillo = Color(0xFFFFC107)
+val MonkiCafe = Color(0xFF6D4C41)
+val MonkiFondo = Color(0xFFFAF0E6)
+val MonkiAmarilloSuave = Color(0xFFFFEBEE)
+
+// --- ESTRUCTURA DE DATOS PARA EL DASHBOARD ---
+data class AdminStat(
+    val title: String,
+    val value: String,
+    val icon: @Composable () -> Unit // Función para colocar cualquier icono o imagen.
+)
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AdminHomeScreen(
     onManageProductsClick: () -> Unit,
-    onManageUsersClick: () -> Unit
+    onManageUsersClick: () -> Unit,
 ) {
-    // 1. GESTIÓN DE ESTADO: Estado para el menú lateral (abierto/cerrado)
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
-    // 'scope' se usa para abrir y cerrar el menú con una animación (corutina)
     val scope = rememberCoroutineScope()
 
-    // 2. EL CONTENEDOR PRINCIPAL: ModalNavigationDrawer
+    // Creación de la lista de datos para llenar el Dashboard.
+    val stats = listOf(
+        AdminStat("Inventario Total", "540", { Icon(painter = painterResource(R.drawable.inventario), contentDescription = null, tint = MonkiAmarillo) }),
+        AdminStat("Usuarios totales", "540", { Icon(painter = painterResource(R.drawable.usuario), contentDescription = null, tint = MonkiAmarillo) }),
+    )
+
     ModalNavigationDrawer(
-        drawerState = drawerState, // Controla si está abierto o cerrado
-
-        // 3. EL CONTENIDO DEL MENÚ (lo que se desliza)
+        drawerState = drawerState,
         drawerContent = {
-            ModalDrawerSheet {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    // Botón 'X' para cerrar
-                    IconButton(
-                        onClick = {
-                            scope.launch { drawerState.close() }
-                        },
-                        modifier = Modifier.align(Alignment.End) // Lo alinea a la derecha
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Close,
-                            contentDescription = "Cerrar menú"
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.height(24.dp))
-
-                    // Botón "Gestionar productos"
-                    NavigationDrawerItem(
-                        label = { Text("Gestionar productos") },
-                        selected = false, // 'false' para que no se quede marcado
-                        onClick = {
-                            scope.launch { drawerState.close() } // Cierra el menú
-                            onManageProductsClick() // Llama a la navegación
-                        }
+            ModalDrawerSheet(
+                drawerContainerColor = MonkiFondo
+            ) {
+                // Header del Menú Lateral (Área de Marca)
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(MonkiCafe)
+                        .padding(16.dp),
+                    horizontalAlignment = Alignment.Start
+                ) {
+                    // Icono MonkiBox en el menú.
+                    Image(
+                        painter = painterResource(R.drawable.mono),
+                        contentDescription = "MonkiBox Logo",
+                        modifier = Modifier.size(60.dp)
                     )
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    // Botón "Gestionar Usuarios"
-                    NavigationDrawerItem(
-                        label = { Text("Gestionar Usuarios") },
-                        selected = false,
-                        onClick = {
-                            scope.launch { drawerState.close() } // Cierra el menú
-                            onManageUsersClick() // Llama a la navegación
-                        }
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = "Panel de Control",
+                        color = Color.White, // Texto en blanco para alto contraste
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 18.sp
+                    )
+                    Text(
+                        text = "¡Hola, Administrador!",
+                        color = Color.LightGray
                     )
                 }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Opciones de Navegación
+
+                NavigationDrawerItem(
+                    // Color del texto
+                    label = { Text("Gestionar Productos", color = MonkiCafe) },
+                    icon = { Icon(
+                        painter = painterResource(R.drawable.inventario),
+                        contentDescription = null,
+                        tint = MonkiCafe,
+                        modifier = Modifier.size(32.dp)
+                    )},
+                    selected = false,
+                    onClick = {
+                        scope.launch { drawerState.close() }
+                        onManageProductsClick()
+                    },
+                    // Color de resaltado sutil al seleccionar un ítem.
+                    colors = NavigationDrawerItemDefaults.colors(
+                        selectedContainerColor = MonkiAmarilloSuave
+                    )
+                )
+
+                NavigationDrawerItem(
+                    label = { Text("Gestionar Usuarios", color = MonkiCafe) },
+                    icon = { Icon(
+                        painter = painterResource(R.drawable.usuario),
+                        contentDescription = null,
+                        tint = MonkiCafe,
+                        modifier = Modifier.size(32.dp)
+                    ) },
+                    selected = false,
+                    onClick = {
+                        scope.launch { drawerState.close() }
+                        onManageUsersClick()
+                    },
+                    colors = NavigationDrawerItemDefaults.colors(
+                        selectedContainerColor = MonkiAmarilloSuave
+                    )
+                )
+
+                // Divisor para separar opciones.
+                Divider(modifier = Modifier.padding(vertical = 10.dp), color = Color.LightGray)
+
+                // NUEVA IMPLEMENTACIÓN: Opción de Cerrar Sesión.
+                NavigationDrawerItem(
+                    label = { Text("Cerrar Sesión", color = MonkiCafe) },
+                    icon = { Icon(Icons.Default.Close, contentDescription = null, tint = MonkiCafe) },
+                    selected = false,
+                    onClick = { /* Lógica de cerrar sesión */ },
+                    colors = NavigationDrawerItemDefaults.colors(
+                        selectedContainerColor = MonkiAmarilloSuave
+                    )
+                )
             }
         }
     ) {
-        // 4. EL CONTENIDO PRINCIPAL DE LA PANTALLA (AdminHomeScreen)
-        // Scaffold nos da la estructura de TopBar + Contenido
+        // 4. CONTENIDO PRINCIPAL (Scaffold)
         Scaffold(
             topBar = {
-                // La barra superior
                 TopAppBar(
                     title = {
-                        // El título que pediste
-                        Text("Bienvenido Administrador")
+                        Text(
+                            "Bienvenido Administrador",
+                            color = MonkiCafe,
+                            fontWeight = FontWeight.SemiBold
+                        )
                     },
+                    //  Colores de la barra superior.
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = MonkiFondo,
+                        navigationIconContentColor = MonkiCafe
+                    ),
                     navigationIcon = {
-                        // El botón de "hamburguesa" (tres rayitas)
                         IconButton(onClick = {
-                            scope.launch { drawerState.open() } // Abre el menú
+                            scope.launch { drawerState.open() }
                         }) {
-                            Icon(
-                                imageVector = Icons.Default.Menu,
-                                contentDescription = "Abrir menú"
-                            )
+                            Icon(Icons.Default.Menu, contentDescription = "Abrir menú")
                         }
                     }
                 )
-            }
+            },
+            containerColor = MonkiFondo
         ) { paddingValues ->
-            // Contenido de la página (debajo de la TopBar)
-            Box(
+
+            // Contenido del Dashboard (en lugar del texto simple)
+            Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(paddingValues),
-                contentAlignment = Alignment.Center
+                    .padding(paddingValues)
+                    .padding(horizontal = 16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text("Selecciona una opción del menú lateral")
+                Spacer(modifier = Modifier.height(16.dp))
+
+                //  Título del Dashboard.
+                Text(
+                    text = "Resumen de MonkiBox",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = MonkiCafe,
+                    modifier = Modifier.align(Alignment.Start).padding(bottom = 16.dp)
+                )
+
+                // LazyVerticalGrid para mostrar estadísticas en un diseño de cuadrícula.
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(2), // Define 2 columnas por fila.
+                    contentPadding = PaddingValues(4.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    // Crea un StatCard por cada elemento en la lista 'stats'.
+                    items(stats.size) { index ->
+                        StatCard(stats[index])
+                    }
+                }
             }
         }
     }
+}
+
+// --- NUEVA IMPLEMENTACIÓN: FUNCIÓN COMPOSABLE PARA UNA TARJETA DE ESTADÍSTICA ---
+@Composable
+fun StatCard(stat: AdminStat) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(120.dp),
+        // NUEVA IMPLEMENTACIÓN: Fondo de la tarjeta en Blanco puro para contraste.
+        colors = CardDefaults.cardColors(
+            containerColor = Color.White
+        ),
+        // NUEVA IMPLEMENTACIÓN: Sombra sutil para un diseño más elegante y tridimensional.
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(12.dp)
+                .fillMaxSize(),
+            verticalArrangement = Arrangement.SpaceBetween
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                stat.icon()
+                Spacer(modifier = Modifier.width(8.dp))
+                // Título de la estadística en Marrón.
+                Text(
+                    text = stat.title,
+                    color = MonkiCafe,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.SemiBold
+                )
+            }
+            // NUEVA IMPLEMENTACIÓN: El valor numérico se muestra grande y en MonkiYellow (acento).
+            Text(
+                text = stat.value,
+                color = MonkiAmarillo,
+                fontSize = 28.sp,
+                fontWeight = FontWeight.ExtraBold
+            )
+        }
+    }
+}
+
+// --- PREVIEW ---
+@Preview(showBackground = true)
+@Composable
+fun PreviewAdminHomeScreen() {
+    AdminHomeScreen({}, {})
 }
