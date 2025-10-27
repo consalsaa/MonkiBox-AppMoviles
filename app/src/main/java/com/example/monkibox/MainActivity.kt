@@ -138,15 +138,24 @@ fun AppNavigation() {
 
         // --- Ruta Home del Admin ---
         composable(route = routeAdminHome) {
-            // Reemplazamos el placeholder por la pantalla real
             AdminHomeScreen(
                 onManageProductsClick = {
-                    // Navega a la pantalla de productos
                     navController.navigate(routeAdminProducts)
                 },
                 onManageUsersClick = {
-                    // Navega a la pantalla de usuarios
                     navController.navigate(routeAdminUsers)
+                },
+                // ¡AÑADE ESTO!
+                onLogoutClick = {
+                    // Navega de vuelta al login
+                    navController.navigate(routeLogin) {
+                        // Borra TODO el historial de navegación ("back stack")
+                        // para que el admin no pueda "volver" con el botón
+                        // de retroceso del celular.
+                        popUpTo(navController.graph.id) {
+                            inclusive = true
+                        }
+                    }
                 }
             )
         }

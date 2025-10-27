@@ -19,6 +19,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.material.icons.automirrored.filled.Logout
+import androidx.compose.material.icons.filled.Logout
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationDrawerItemDefaults
 import kotlinx.coroutines.launch
 import com.example.monkibox.R
 
@@ -40,6 +44,7 @@ data class AdminStat(
 fun AdminHomeScreen(
     onManageProductsClick: () -> Unit,
     onManageUsersClick: () -> Unit,
+    onLogoutClick: () -> Unit
 ) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -128,14 +133,23 @@ fun AdminHomeScreen(
                 // Divisor para separar opciones.
                 Divider(modifier = Modifier.padding(vertical = 10.dp), color = Color.LightGray)
 
-                // NUEVA IMPLEMENTACIÓN: Opción de Cerrar Sesión.
                 NavigationDrawerItem(
-                    label = { Text("Cerrar Sesión", color = MonkiCafe) },
-                    icon = { Icon(Icons.Default.Close, contentDescription = null, tint = MonkiCafe) },
+                    label = { Text("Cerrar Sesión", color = MaterialTheme.colorScheme.error) },
+                    icon = {
+                        Icon(
+                            Icons.AutoMirrored.Filled.Logout,
+                            contentDescription = "Cerrar Sesión",
+                            tint = MaterialTheme.colorScheme.error
+                        )
+                    },
                     selected = false,
-                    onClick = { /* Lógica de cerrar sesión */ },
+                    onClick = {
+                        // Lógica de cerrar sesión
+                        scope.launch { drawerState.close() } // Cierra el menú
+                        onLogoutClick()
+                    },
                     colors = NavigationDrawerItemDefaults.colors(
-                        selectedContainerColor = MonkiAmarilloSuave
+                        unselectedContainerColor = Color.Transparent
                     )
                 )
             }
@@ -251,5 +265,5 @@ fun StatCard(stat: AdminStat) {
 @Preview(showBackground = true)
 @Composable
 fun PreviewAdminHomeScreen() {
-    AdminHomeScreen({}, {})
+    AdminHomeScreen({}, {}, {})
 }
