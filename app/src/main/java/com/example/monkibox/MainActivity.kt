@@ -1,4 +1,11 @@
 package com.example.monkibox
+import com.example.monkibox.admin.AdminHomeScreen
+import com.example.monkibox.admin.AdminProductsScreen
+import com.example.monkibox.admin.AdminUsersScreen
+import com.example.monkibox.login.LoginScreen
+import com.example.monkibox.login.RegisterScreen
+import com.example.monkibox.login.UserStorage
+import com.example.monkibox.usuario.UserHomeScreen
 
 import android.os.Bundle
 import android.widget.Toast
@@ -14,14 +21,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-
-import com.example.monkibox.admin.AdminHomeScreen
-import com.example.monkibox.admin.AdminProductsScreen
-import com.example.monkibox.admin.AdminUsersScreen
-import com.example.monkibox.login.LoginScreen
-import com.example.monkibox.login.RegisterScreen
-import com.example.monkibox.login.UserStorage
-
+import androidx.navigation.NavType
+import androidx.navigation.navArgument
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -42,7 +43,7 @@ fun AppNavigation() {
     // Definimos las rutas
     val routeLogin = "login"
     val routeRegister = "register"
-    val routeUserHome = "main"
+    val routeUserHome = "main/{email}"
     val routeAdminHome = "admin"
     val routeAdminProducts = "admin_producto"
     val routeAdminUsers = "admin_usuarios"
@@ -76,7 +77,7 @@ fun AppNavigation() {
                     } else if (UserStorage.checkLogin(context, email, password)) {
                         // 3. Es Usuario (verificamos con SharedPreferences)
                         Toast.makeText(context, "Bienvenido Usuario", Toast.LENGTH_SHORT).show()
-                        navController.navigate(routeUserHome) {
+                        navController.navigate("main/$email") {
                             popUpTo(routeLogin) { inclusive = true }
                         }
 
@@ -114,10 +115,24 @@ fun AppNavigation() {
         }
 
         // --- Ruta "main.kt" (Home del Usuario) ---
-        composable(route = routeUserHome) {
-            // Este es tu "main.kt". Lo crearemos después.
-            // Por ahora, es un placeholder.
-            UserHomeScreen()
+        composable(
+            route = routeUserHome,
+            arguments = listOf(navArgument("email") { type = NavType.StringType })
+        ) { backStackEntry ->
+            // Obtenemos el email de la ruta
+            val email = backStackEntry.arguments?.getString("email") ?: "Usuario"
+
+            // Reemplazamos el placeholder por la pantalla real
+            UserHomeScreen(
+                email = email,
+                onLogoutClick = {
+                    // Esta es la acción para volver al Login
+                    navController.navigate(routeLogin) {
+                        // Borramos toda la pila de navegación del usuario
+                        popUpTo(navController.graph.id) { inclusive = true }
+                    }
+                }
+            )
         }
 
         // --- Ruta Home del Admin ---
@@ -152,13 +167,6 @@ fun AppNavigation() {
                 }
             )
         }
-    }
-}
-
-@Composable
-fun UserHomeScreen() {
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Text("Bienvenido a la Home del USUARIO (main.kt)")
     }
 }
 
