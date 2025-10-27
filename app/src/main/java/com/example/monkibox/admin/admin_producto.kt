@@ -28,6 +28,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import coil.compose.AsyncImage
+import com.example.monkibox.ui.theme.MonkiAmarillo
+import com.example.monkibox.ui.theme.MonkiCafe
+import com.example.monkibox.ui.theme.MonkiFondo
 import kotlin.random.Random
 
 

@@ -1,4 +1,5 @@
 package com.example.monkibox.usuario
+import androidx.compose.foundation.background
 import com.example.monkibox.HistoryViewModel
 
 import androidx.compose.foundation.clickable
@@ -20,6 +21,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.monkibox.ui.theme.MonkiAmarillo
+import com.example.monkibox.ui.theme.MonkiCafe
+import com.example.monkibox.ui.theme.MonkiFondo
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -37,6 +41,7 @@ fun HistoryScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .background(MonkiFondo)
             .padding(16.dp)
     ) {
         // Título de la pantalla
@@ -44,6 +49,7 @@ fun HistoryScreen(
             text = "Historial de boletas",
             style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold,
+            color = MonkiCafe,
             modifier = Modifier.padding(bottom = 16.dp)
         )
 
@@ -87,8 +93,10 @@ fun PurchaseItemCard(
         modifier = Modifier
             .fillMaxWidth()
             .clickable { onClick() }, // Hacemos toda la tarjeta clickeable
+        colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-    ) {
+
+        ) {
         Row(
             modifier = Modifier
                 .padding(16.dp)
@@ -103,12 +111,13 @@ fun PurchaseItemCard(
                 Text(
                     text = "ID: ${purchase.id.substring(0, 8)}", // ID corto
                     fontSize = 12.sp,
-                    color = Color.Gray
+                    color = MonkiCafe.copy(alpha = 0.6f)
                 )
                 Text(
                     text = "Cantidad: ${purchase.items.sumOf { it.quantity }} productos",
                     fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp
+                    fontSize = 16.sp,
+                    color = MonkiCafe
                 )
             }
 
@@ -120,13 +129,13 @@ fun PurchaseItemCard(
                 Icon(
                     imageVector = Icons.Default.KeyboardArrowDown,
                     contentDescription = "Ver detalle",
-                    tint = MaterialTheme.colorScheme.primary
+                    tint = MonkiCafe
                 )
                 Text(
                     text = "$${String.format("%.2f", purchase.total)}",
                     fontWeight = FontWeight.Bold,
                     fontSize = 18.sp,
-                    color = MaterialTheme.colorScheme.primary
+                    color = MonkiAmarillo
                 )
             }
         }
@@ -151,7 +160,8 @@ fun PurchaseDetailDialog(
         Card(
             modifier = Modifier
                 .fillMaxWidth(0.95f) // 95% del ancho
-                .fillMaxHeight(0.85f) // 85% del alto
+                .fillMaxHeight(0.85f), // 85% del alto
+            colors = CardDefaults.cardColors(containerColor = MonkiFondo)
         ) {
             Column {
                 // 1. Título y Botón de Cerrar
@@ -166,10 +176,11 @@ fun PurchaseDetailDialog(
                         text = "Detalle de la Boleta",
                         style = MaterialTheme.typography.headlineSmall,
                         fontWeight = FontWeight.Bold,
+                        color = MonkiCafe,
                         modifier = Modifier.weight(1f)
                     )
                     IconButton(onClick = onDismiss) {
-                        Icon(Icons.Default.Close, "Cerrar")
+                        Icon(Icons.Default.Close, "Cerrar", tint = MonkiCafe)
                     }
                 }
 
@@ -180,8 +191,8 @@ fun PurchaseDetailDialog(
                         .padding(bottom = 16.dp)
                         .verticalScroll(rememberScrollState())
                 ) {
-                    Text("ID: ${purchase.id}", fontSize = 12.sp, color = Color.Gray)
-                    Text("Fecha: $formattedDate", fontSize = 12.sp, color = Color.Gray)
+                    Text("ID: ${purchase.id}", fontSize = 12.sp, color = MonkiCafe.copy(alpha = 0.6f))
+                    Text("Fecha: $formattedDate", fontSize = 12.sp, color = MonkiCafe.copy(alpha = 0.6f))
 
                     Spacer(modifier = Modifier.height(16.dp))
 
@@ -189,7 +200,7 @@ fun PurchaseDetailDialog(
                     TotalRow(label = "Subtotal", amount = purchase.subtotal)
                     TotalRow(label = "Envío", amount = purchase.shipping)
                     TotalRow(label = "Impuestos", amount = purchase.taxes)
-                    Divider(modifier = Modifier.padding(vertical = 8.dp))
+                    Divider(modifier = Modifier.padding(vertical = 8.dp), color = MonkiCafe.copy(alpha = 0.5f))
                     TotalRow(
                         label = "Total Pagado",
                         amount = purchase.total,
@@ -202,7 +213,8 @@ fun PurchaseDetailDialog(
                     Text(
                         text = "Productos",
                         style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
+                        color = MonkiCafe
                     )
                     Spacer(modifier = Modifier.height(8.dp))
 
@@ -232,15 +244,18 @@ fun DialogProductRow(item: CartItem) {
         Text(
             text = "(${item.quantity}x)",
             modifier = Modifier.width(40.dp),
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
+            color = MonkiCafe
         )
         Text(
             text = item.product.name,
-            modifier = Modifier.weight(1f)
+            modifier = Modifier.weight(1f),
+            color = MonkiCafe
         )
         Text(
             text = "$${String.format("%.2f", item.product.price * item.quantity)}",
-            fontWeight = FontWeight.SemiBold
+            fontWeight = FontWeight.SemiBold,
+            color = MonkiAmarillo
         )
     }
 }
@@ -258,12 +273,13 @@ fun TotalRow(label: String, amount: Double, isBold: Boolean = false) {
             text = label,
             fontSize = if (isBold) 18.sp else 16.sp,
             fontWeight = if (isBold) FontWeight.Bold else FontWeight.Normal,
-            color = if (isBold) MaterialTheme.colorScheme.onSurface else Color.Gray
+            color = if (isBold) MonkiCafe else MonkiCafe.copy(alpha = 0.8f)
         )
         Text(
             text = "$${String.format("%.2f", amount)}",
             fontSize = if (isBold) 18.sp else 16.sp,
             fontWeight = if (isBold) FontWeight.Bold else FontWeight.Normal,
+            color = if (isBold) MonkiAmarillo else MonkiCafe
         )
     }
 }

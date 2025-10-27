@@ -25,12 +25,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationDrawerItemDefaults
 import kotlinx.coroutines.launch
 import com.example.monkibox.R
+import com.example.monkibox.ui.theme.MonkiAmarillo
+import com.example.monkibox.ui.theme.MonkiAmarilloSuave
+import com.example.monkibox.ui.theme.MonkiCafe
+import com.example.monkibox.ui.theme.MonkiFondo
 
-// --- DEFINICIÓN DE COLORES DEL TEMA MONKIBOX ---
-val MonkiAmarillo = Color(0xFFFFC107)
-val MonkiCafe = Color(0xFF6D4C41)
-val MonkiFondo = Color(0xFFFAF0E6)
-val MonkiAmarilloSuave = Color(0xFFFFEBEE)
 
 // --- ESTRUCTURA DE DATOS PARA EL DASHBOARD ---
 data class AdminStat(

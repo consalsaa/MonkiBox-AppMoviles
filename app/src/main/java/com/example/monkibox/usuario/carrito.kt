@@ -24,6 +24,12 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import android.widget.Toast
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import com.example.monkibox.ui.theme.MonkiAmarillo
+import com.example.monkibox.ui.theme.MonkiAmarilloSuave
+import com.example.monkibox.ui.theme.MonkiCafe
+import com.example.monkibox.ui.theme.MonkiFondo
 
 @Composable
 fun CartScreen(viewModel: CartViewModel) {
@@ -35,6 +41,7 @@ fun CartScreen(viewModel: CartViewModel) {
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .background(MonkiFondo)
             .padding(16.dp)
     ) {
         // Título de la pantalla
@@ -42,6 +49,7 @@ fun CartScreen(viewModel: CartViewModel) {
             text = "Carrito",
             style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold,
+            color = MonkiCafe,
             modifier = Modifier.padding(bottom = 16.dp)
         )
 
@@ -77,12 +85,13 @@ fun CartScreen(viewModel: CartViewModel) {
             },
             modifier = Modifier.fillMaxWidth().height(50.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFF4CAF50) // Tono verde
+                containerColor = MonkiAmarillo,
+                contentColor = MonkiCafe
             ),
             // No se puede comprar si el carrito está vacío
             enabled = cartItems.isNotEmpty()
         ) {
-            Text("Realizar compra", fontSize = 18.sp)
+            Text("Realizar compra", fontSize = 18.sp, fontWeight = FontWeight.Bold)
         }
     }
 }
@@ -99,6 +108,7 @@ fun CartItemRow(
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Row(
@@ -111,7 +121,8 @@ fun CartItemRow(
                 contentDescription = item.product.name,
                 modifier = Modifier
                     .size(80.dp)
-                    .clip(RoundedCornerShape(8.dp)),
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(MonkiAmarilloSuave),
                 contentScale = ContentScale.Crop,
                 placeholder = painterResource(id = R.drawable.mono),
                 error = painterResource(id = R.drawable.mono)
@@ -127,15 +138,17 @@ fun CartItemRow(
                 Text(
                     text = item.product.name,
                     fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp
+                    fontSize = 16.sp,
+                    color = MonkiCafe
                 )
 
                 // Botón "Eliminar" (como en tu imagen)
                 TextButton(
                     onClick = onRemove,
-                    modifier = Modifier.padding(0.dp)
+                    modifier = Modifier.padding(0.dp),
+                    colors = ButtonDefaults.textButtonColors(contentColor = MonkiCafe)
                 ) {
-                    Text("Eliminar", color = MaterialTheme.colorScheme.primary)
+                    Text("Eliminar", fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
                 }
 
                 // Selector de cantidad (simplificado)
@@ -152,7 +165,8 @@ fun CartItemRow(
             Text(
                 text = "$${String.format("%.2f", item.product.price * item.quantity)}",
                 fontWeight = FontWeight.Bold,
-                fontSize = 16.sp
+                fontSize = 16.sp,
+                color = MonkiAmarillo
             )
         }
     }
@@ -184,12 +198,14 @@ fun CartTotalsSummary(totals: CartTotals) {
             Text(
                 text = "Total",
                 fontSize = 20.sp,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                color = MonkiCafe
             )
             Text(
                 text = "$${String.format("%.2f", totals.total)}",
                 fontSize = 20.sp,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                color = MonkiCafe
             )
         }
     }
@@ -202,8 +218,8 @@ fun TotalRow(label: String, amount: Double) {
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Text(text = label, fontSize = 16.sp, color = Color.Gray)
-        Text(text = "$${String.format("%.2f", amount)}", fontSize = 16.sp)
+        Text(text = label, fontSize = 16.sp, color = MonkiCafe.copy(alpha = 0.8f))
+        Text(text = "$${String.format("%.2f", amount)}", fontSize = 16.sp, color = MonkiCafe)
     }
 }
 
@@ -226,9 +242,12 @@ fun QuantitySelectorSimple(
             text = quantity.toString(),
             modifier = Modifier.padding(horizontal = 16.dp)
         )
+        // Botón Quitar (-)
         OutlinedIconButton(
             onClick = { onQuantityChange(quantity + 1) },
-            modifier = Modifier.size(36.dp)
+            modifier = Modifier.size(36.dp),
+            colors = IconButtonDefaults.outlinedIconButtonColors(contentColor = MonkiCafe),
+            border = BorderStroke(1.dp, MonkiCafe)
         ) {
             Text("+")
         }

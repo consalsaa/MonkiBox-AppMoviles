@@ -1,4 +1,5 @@
 package com.example.monkibox.usuario
+import androidx.compose.foundation.background
 import com.example.monkibox.R
 import com.example.monkibox.ProductViewModel
 import com.example.monkibox.admin.Product
@@ -23,6 +24,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -31,6 +33,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
+import com.example.monkibox.ui.theme.MonkiAmarilloSuave
+import com.example.monkibox.ui.theme.MonkiCafe
 
 // import com.tuproyecto.R // (Asegúrate de tener R.drawable.mono)
 
@@ -47,6 +51,7 @@ fun ProductsScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .background(com.example.monkibox.ui.theme.MonkiFondo)
             .padding(16.dp)
     ) {
         // 4. Título de la pantalla
@@ -54,6 +59,7 @@ fun ProductsScreen(
             text = "Productos",
             style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold,
+            color = MonkiCafe,
             modifier = Modifier.padding(bottom = 16.dp)
         )
 
@@ -89,6 +95,7 @@ fun ProductCard(
         modifier = Modifier
             .fillMaxWidth()
             .clickable { onClick() }, // Hacemos la tarjeta clickeable
+        colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column {
@@ -98,8 +105,9 @@ fun ProductCard(
                 contentDescription = product.name,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(180.dp), // Altura fija para que la cuadrícula sea uniforme
-                contentScale = ContentScale.Crop, // Rellena el espacio
+                    .height(180.dp)
+                    .background(MonkiAmarilloSuave),
+                contentScale = ContentScale.Crop,
                 placeholder = painterResource(id = R.drawable.mono),
                 error = painterResource(id = R.drawable.mono)
             )
@@ -114,7 +122,8 @@ fun ProductCard(
                     fontWeight = FontWeight.Bold,
                     style = MaterialTheme.typography.titleMedium,
                     maxLines = 1, // Evita que nombres largos rompan el diseño
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
+                    color = MonkiCafe
                 )
 
                 Spacer(modifier = Modifier.height(4.dp))
@@ -122,7 +131,8 @@ fun ProductCard(
                 // 3. Precio
                 Text(
                     text = "$${String.format("%.2f", product.price)}", // Formateado
-                    style = MaterialTheme.typography.bodyMedium
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MonkiCafe
                 )
             }
         }

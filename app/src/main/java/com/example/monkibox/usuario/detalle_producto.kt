@@ -27,6 +27,9 @@ import androidx.compose.ui.platform.LocalContext
 import android.widget.Toast
 import coil.compose.AsyncImage
 import com.example.monkibox.CartViewModel
+import com.example.monkibox.ui.theme.MonkiAmarillo
+import com.example.monkibox.ui.theme.MonkiCafe
+import com.example.monkibox.ui.theme.MonkiFondo
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -52,18 +55,25 @@ fun ProductDetailScreen(
     val context = LocalContext.current
 
     Scaffold(
+        containerColor = MonkiFondo,
         topBar = {
             // 1. La flecha sigue estando en la barra superior
             TopAppBar(
-                title = { Text(product?.name ?: "Detalle") },
+                title = { Text(product?.name ?: "Detalle", color = MonkiCafe, fontWeight = FontWeight.SemiBold) },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
                         Icon(
                             imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Volver"
+                            contentDescription = "Volver",
+                            tint = MonkiCafe
                         )
                     }
-                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MonkiFondo,
+                    navigationIconContentColor = MonkiCafe,
+                    titleContentColor = MonkiCafe
+                )
             )
         }
     ) { paddingValues ->
@@ -106,7 +116,8 @@ fun ProductDetailScreen(
                     Text(
                         text = product!!.name,
                         style = MaterialTheme.typography.headlineLarge,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
+                        color = MonkiCafe
                     )
 
                     Spacer(modifier = Modifier.height(8.dp))
@@ -115,7 +126,7 @@ fun ProductDetailScreen(
                     Text(
                         text = "$${String.format("%.2f", product!!.price)}",
                         style = MaterialTheme.typography.headlineMedium,
-                        color = MaterialTheme.colorScheme.primary
+                        color = MonkiAmarillo
                     )
 
                     Spacer(modifier = Modifier.height(24.dp))
@@ -124,12 +135,14 @@ fun ProductDetailScreen(
                     Text(
                         text = "Descripción",
                         style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
+                        color = MonkiCafe
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
                         text = product!!.description,
-                        style = MaterialTheme.typography.bodyLarge
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MonkiCafe
                     )
 
                     Spacer(modifier = Modifier.height(32.dp)) // Espacio antes del selector
@@ -139,8 +152,8 @@ fun ProductDetailScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .border(
-                                BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
-                                shape = RoundedCornerShape(50.dp) // Marco "circular"
+                                BorderStroke(1.dp, MonkiCafe),
+                                shape = RoundedCornerShape(50.dp)
                             )
                     ) {
                         QuantitySelector(
@@ -161,10 +174,11 @@ fun ProductDetailScreen(
                         },
                         modifier = Modifier.fillMaxWidth().height(50.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFF4CAF50) // Tono verde
+                            containerColor = MonkiAmarillo,
+                            contentColor = MonkiCafe
                         )
                     ) {
-                        Text("Agregar al Carrito", fontSize = 18.sp)
+                        Text("Agregar al Carrito", fontSize = 18.sp, fontWeight = FontWeight.Bold)
                     }
                 }
             }
@@ -191,7 +205,9 @@ fun QuantitySelector(
             onClick = {
                 if (quantity > 1) { onQuantityChange(quantity - 1) }
             },
-            modifier = Modifier.size(48.dp)
+            modifier = Modifier.size(48.dp),
+            colors = IconButtonDefaults.outlinedIconButtonColors(
+                contentColor = MonkiCafe),
         ) {
             Icon(Icons.Default.Remove, contentDescription = "Quitar uno")
         }
@@ -200,6 +216,7 @@ fun QuantitySelector(
             text = quantity.toString(),
             style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold,
+            color = MonkiCafe,
             modifier = Modifier.padding(horizontal = 24.dp)
         )
 
@@ -207,8 +224,8 @@ fun QuantitySelector(
             onClick = { onQuantityChange(quantity + 1) },
             modifier = Modifier.size(48.dp),
             colors = IconButtonDefaults.iconButtonColors(
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary
+                containerColor = MonkiCafe,
+                contentColor = Color.White
             )
         ) {
             Icon(Icons.Default.Add, contentDescription = "Añadir uno")
