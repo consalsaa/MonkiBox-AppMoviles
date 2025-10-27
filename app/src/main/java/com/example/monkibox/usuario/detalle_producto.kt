@@ -25,9 +25,11 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.ui.platform.LocalContext
 import android.widget.Toast
+import androidx.compose.foundation.background
 import coil.compose.AsyncImage
 import com.example.monkibox.CartViewModel
 import com.example.monkibox.ui.theme.MonkiAmarillo
+import com.example.monkibox.ui.theme.MonkiAmarilloSuave
 import com.example.monkibox.ui.theme.MonkiCafe
 import com.example.monkibox.ui.theme.MonkiFondo
 
@@ -99,7 +101,9 @@ fun ProductDetailScreen(
                     contentDescription = product!!.name,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(300.dp),
+                        .height(300.dp)
+                        .background(MonkiAmarilloSuave)
+                        .border(BorderStroke(5.dp, MonkiAmarillo)),
                     contentScale = ContentScale.Crop,
                     placeholder = painterResource(id = R.drawable.mono),
                     error = painterResource(id = R.drawable.mono)

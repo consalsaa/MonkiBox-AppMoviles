@@ -24,6 +24,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -35,6 +36,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.monkibox.ui.theme.MonkiAmarillo
+import com.example.monkibox.ui.theme.MonkiAmarilloSuave
+import com.example.monkibox.ui.theme.MonkiCafe
+import com.example.monkibox.ui.theme.MonkiFondo
 
 // Usamos @OptIn para el Scaffold y TopAppBar
 @OptIn(ExperimentalMaterial3Api::class)
@@ -47,21 +52,28 @@ fun AdminUsersScreen(
 
     // AÑADIMOS UN SCAFFOLD
     Scaffold(
+        containerColor = MonkiFondo,
         topBar = {
             // BARRA SUPERIOR
             TopAppBar(
                 title = {
                     // TÍTULO AQUÍ
-                    Text("Gestión de Usuarios")
+                    Text("Gestión de Usuarios", color = MonkiCafe, fontWeight = FontWeight.SemiBold)
                 },
                 navigationIcon = {
                     IconButton(onClick = { onBackClick() }) {
                         Icon(
                             imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Volver"
+                            contentDescription = "Volver",
+                            tint = MonkiCafe
                         )
                     }
-                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MonkiAmarillo,
+                    navigationIconContentColor = MonkiCafe,
+                    titleContentColor = MonkiCafe
+                )
             )
         }
     ) { paddingValues ->
@@ -70,7 +82,7 @@ fun AdminUsersScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues) // Usamos el padding de Scaffold
-                .padding(16.dp),
+                .padding(horizontal = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
@@ -78,17 +90,19 @@ fun AdminUsersScreen(
 
             Text(
                 text = "Número de usuarios",
-                style = MaterialTheme.typography.titleMedium
+                style = MaterialTheme.typography.titleMedium,
+                color = MonkiCafe
             )
 
             Text(
                 text = userList.size.toString(),
                 style = MaterialTheme.typography.displaySmall,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                color = MonkiCafe
             )
 
             Spacer(modifier = Modifier.height(24.dp))
-            Divider()
+            Divider(color = MonkiCafe.copy(alpha = 0.5f))
 
             LazyColumn(
                 modifier = Modifier
@@ -99,11 +113,10 @@ fun AdminUsersScreen(
                     Text(
                         text = email,
                         fontSize = 18.sp,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 8.dp)
+                        color = MonkiCafe,
+                        fontWeight = FontWeight.Medium
                     )
-                    Divider()
+                    Divider(color = MonkiCafe.copy(alpha = 0.2f))
                 }
             }
         }

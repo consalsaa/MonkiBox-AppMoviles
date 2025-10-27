@@ -249,7 +249,6 @@ fun StatCard(stat: AdminStat) {
                     fontWeight = FontWeight.SemiBold
                 )
             }
-            // NUEVA IMPLEMENTACIÓN: El valor numérico se muestra grande y en MonkiYellow (acento).
             Text(
                 text = stat.value,
                 color = MonkiAmarillo,
