@@ -1,35 +1,37 @@
 package com.example.monkibox
-import com.example.monkibox.admin.AdminHomeScreen
-import com.example.monkibox.admin.AdminProductsScreen
-import com.example.monkibox.admin.AdminUsersScreen
-import com.example.monkibox.login.LoginScreen
-import com.example.monkibox.login.RegisterScreen
-import com.example.monkibox.login.UserStorage
-import com.example.monkibox.usuario.UserHomeScreen
 
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.NavType
 import androidx.navigation.navArgument
+
+// Importaciones de pantallas
+import com.example.monkibox.admin.AdminHomeScreen
+import com.example.monkibox.admin.AdminProductsScreen
+import com.example.monkibox.admin.AdminUsersScreen
+import com.example.monkibox.login.LoginScreen
+import com.example.monkibox.login.RegisterScreen
+import com.example.monkibox.usuario.UserHomeScreen
+
+// Importamos el ViewModel
+import com.example.monkibox.viewmodels.UserViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            // AppTheme {}
+            // AppTheme { ... }
             AppNavigation()
         }
     }
@@ -38,8 +40,13 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun AppNavigation() {
     val navController = rememberNavController()
-    // Necesitamos el contexto para usar UserStorage
     val context = LocalContext.current
+
+    // Instanciamos el UserViewModel (Gestor de Autenticación con Backend)
+    val userViewModel: UserViewModel = viewModel()
+
+    // Observamos el estado de autenticación
+    val authState by userViewModel.authStatus.collectAsState()
 
     // Definimos las rutas
     val routeLogin = "login"
@@ -48,6 +55,37 @@ fun AppNavigation() {
     val routeAdminHome = "admin"
     val routeAdminProducts = "admin_producto"
     val routeAdminUsers = "admin_usuarios"
+
+    // "Efecto Secundario" para manejar la respuesta del servidor
+    // Esto se ejecuta automáticamente cuando 'authState' cambia (Success o Error)
+    LaunchedEffect(authState) {
+        when (val result = authState) {
+            is UserViewModel.AuthResult.Success -> {
+                val user = result.user
+                Toast.makeText(context, "Bienvenido ${user.email}", Toast.LENGTH_SHORT).show()
+
+                // Verificamos el ROL que viene de la Base de Datos (Spring Boot)
+                if (user.role == "ADMIN") {
+                    navController.navigate(routeAdminHome) {
+                        popUpTo(routeLogin) { inclusive = true }
+                    }
+                } else {
+                    // Si es USER, vamos al home de usuario
+                    navController.navigate("main/${user.email}") {
+                        popUpTo(routeLogin) { inclusive = true }
+                    }
+                }
+                // Limpiamos el estado para evitar re-navegación
+                userViewModel.clearAuthStatus()
+            }
+            is UserViewModel.AuthResult.Error -> {
+                // Si falló (contraseña mal, error de red, etc.)
+                Toast.makeText(context, result.message, Toast.LENGTH_SHORT).show()
+                userViewModel.clearAuthStatus()
+            }
+            null -> { /* No hacemos nada mientras esperamos */ }
+        }
+    }
 
     NavHost(
         navController = navController,
@@ -58,34 +96,9 @@ fun AppNavigation() {
         composable(route = routeLogin) {
             LoginScreen(
                 onLoginClick = { email, password ->
-                    // --- LÓGICA DE LOGIN ---
-
-                    // 1. Definimos el admin (puedes cambiar esto)
-                    val adminEmail = "admin@monkibox.com"
-                    val adminPass = "admin123"
-
-                    if (email.isBlank() || password.isBlank()) {
-                        Toast.makeText(context, "Campos vacíos", Toast.LENGTH_SHORT).show()
-
-                    } else if (email == adminEmail && password == adminPass) {
-                        // 2. Es Admin
-                        Toast.makeText(context, "Bienvenido Admin", Toast.LENGTH_SHORT).show()
-                        navController.navigate(routeAdminHome) {
-                            // Borramos la pila de navegación para que no pueda "volver" al login
-                            popUpTo(routeLogin) { inclusive = true }
-                        }
-
-                    } else if (UserStorage.checkLogin(context, email, password)) {
-                        // 3. Es Usuario (verificamos con SharedPreferences)
-                        Toast.makeText(context, "Bienvenido Usuario", Toast.LENGTH_SHORT).show()
-                        navController.navigate("main/$email") {
-                            popUpTo(routeLogin) { inclusive = true }
-                        }
-
-                    } else {
-                        // 4. Datos incorrectos
-                        Toast.makeText(context, "Correo o contraseña incorrectos", Toast.LENGTH_SHORT).show()
-                    }
+                    // Llamamos al ViewModel.
+                    // Él hablará con Spring Boot.
+                    userViewModel.login(email, password)
                 },
                 onRegisterClick = {
                     navController.navigate(routeRegister)
@@ -97,19 +110,12 @@ fun AppNavigation() {
         composable(route = routeRegister) {
             RegisterScreen(
                 onRegisterClick = { email, password ->
-                    // --- LÓGICA DE REGISTRO ---
-                    // Guardamos el usuario usando nuestra clase UserStorage
-                    UserStorage.saveUser(context, email, password)
+                    // Llamamos al ViewModel para registrar en la BD real
+                    userViewModel.register(email, password)
 
-                    // Mostramos notificación
-                    Toast.makeText(context, "¡Usuario registrado con éxito!", Toast.LENGTH_SHORT)
-                        .show()
-
-                    // Lo mandamos de vuelta al Login
-                    navController.popBackStack()
+                    // Si el registro es exitoso, el LaunchedEffect de arriba lo detectará y navegará solo.
                 },
                 onBackToLoginClick = {
-                    // Vuelve a la pantalla anterior (login)
                     navController.popBackStack()
                 }
             )
@@ -120,16 +126,12 @@ fun AppNavigation() {
             route = routeUserHome,
             arguments = listOf(navArgument("email") { type = NavType.StringType })
         ) { backStackEntry ->
-            // Obtenemos el email de la ruta
             val email = backStackEntry.arguments?.getString("email") ?: "Usuario"
 
-            // Reemplazamos el placeholder por la pantalla real
             UserHomeScreen(
                 email = email,
                 onLogoutClick = {
-                    // Esta es la acción para volver al Login
                     navController.navigate(routeLogin) {
-                        // Borramos toda la pila de navegación del usuario
                         popUpTo(navController.graph.id) { inclusive = true }
                     }
                 }
@@ -145,13 +147,8 @@ fun AppNavigation() {
                 onManageUsersClick = {
                     navController.navigate(routeAdminUsers)
                 },
-                // ¡AÑADE ESTO!
                 onLogoutClick = {
-                    // Navega de vuelta al login
                     navController.navigate(routeLogin) {
-                        // Borra TODO el historial de navegación ("back stack")
-                        // para que el admin no pueda "volver" con el botón
-                        // de retroceso del celular.
                         popUpTo(navController.graph.id) {
                             inclusive = true
                         }
@@ -164,7 +161,7 @@ fun AppNavigation() {
         composable(route = routeAdminProducts) {
             AdminProductsScreen(
                 onBackClick = {
-                    navController.popBackStack() // Vuelve a la pantalla anterior
+                    navController.popBackStack()
                 }
             )
         }
@@ -173,16 +170,9 @@ fun AppNavigation() {
         composable(route = routeAdminUsers) {
             AdminUsersScreen(
                 onBackClick = {
-                    navController.popBackStack() // Vuelve a la pantalla anterior
+                    navController.popBackStack()
                 }
             )
         }
-    }
-}
-
-@Composable
-fun AdminHomeScreen() {
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Text("Bienvenido a la Home del ADMIN")
     }
 }

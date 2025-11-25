@@ -2,7 +2,7 @@ package com.example.monkibox.usuario
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import com.example.monkibox.R
-import com.example.monkibox.ProductViewModel
+import com.example.monkibox.viewmodels.ProductViewModel
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -26,7 +26,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.ui.platform.LocalContext
 import android.widget.Toast
 import coil.compose.AsyncImage
-import com.example.monkibox.CartViewModel
+import com.example.monkibox.viewmodels.CartViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -40,18 +40,21 @@ fun ProductDetailScreen(
     // Usamos 'derivedStateOf' para que solo se recalcule si el ID o la lista cambian
     val product by remember(productId, viewModel.productList.collectAsState().value) {
         derivedStateOf {
-            viewModel.productList.value.find { it.id == productId }
+            viewModel.productList.value.find { it.id == productId.toLongOrNull() }
         }
     }
 
     // 2. Estado para el selector de cantidad
     var quantity by remember { mutableStateOf(1) }
 
+    val monkiBackground = Color(0xFFEFEADC)
+
     val cartViewModel: CartViewModel = viewModel()
 
     val context = LocalContext.current
 
     Scaffold(
+        containerColor = monkiBackground,
         topBar = {
             // 1. La flecha sigue estando en la barra superior
             TopAppBar(
@@ -63,7 +66,10 @@ fun ProductDetailScreen(
                             contentDescription = "Volver"
                         )
                     }
-                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = monkiBackground
+                )
             )
         }
     ) { paddingValues ->
@@ -115,7 +121,7 @@ fun ProductDetailScreen(
                     Text(
                         text = "$${String.format("%.2f", product!!.price)}",
                         style = MaterialTheme.typography.headlineMedium,
-                        color = MaterialTheme.colorScheme.primary
+                        color = Color(0xFF000000)
                     )
 
                     Spacer(modifier = Modifier.height(24.dp))
@@ -173,7 +179,7 @@ fun ProductDetailScreen(
 }
 
 /**
- * Selector de cantidad (no cambia)
+ * Selector de cantidad
  */
 @Composable
 fun QuantitySelector(
@@ -207,8 +213,8 @@ fun QuantitySelector(
             onClick = { onQuantityChange(quantity + 1) },
             modifier = Modifier.size(48.dp),
             colors = IconButtonDefaults.iconButtonColors(
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary
+                containerColor = Color(0xFFE7D8B8),
+                contentColor = Color.Black
             )
         ) {
             Icon(Icons.Default.Add, contentDescription = "Añadir uno")

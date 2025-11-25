@@ -36,6 +36,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import com.example.monkibox.R
+import com.example.monkibox.login.RegisterScreen
 
 @Composable
 fun RegisterScreen(onRegisterClick: (String, String) -> Unit, onBackToLoginClick: () -> Unit) {

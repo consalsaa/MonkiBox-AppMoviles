@@ -2,9 +2,12 @@ package com.example.monkibox.admin
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Menu
@@ -20,11 +23,23 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.material.icons.automirrored.filled.Logout
+import androidx.compose.material.icons.filled.Group
+import androidx.compose.material.icons.filled.Inventory
 import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationDrawerItemDefaults
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.graphics.vector.Group
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.style.TextAlign
+import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.launch
 import com.example.monkibox.R
+import com.example.monkibox.viewmodels.HistoryViewModel
+import com.example.monkibox.viewmodels.ProductViewModel
+import com.example.monkibox.viewmodels.UserViewModel
 
 // --- DEFINICIÓN DE COLORES DEL TEMA MONKIBOX ---
 val MonkiAmarillo = Color(0xFFFFC107)
@@ -44,16 +59,30 @@ data class AdminStat(
 fun AdminHomeScreen(
     onManageProductsClick: () -> Unit,
     onManageUsersClick: () -> Unit,
-    onLogoutClick: () -> Unit
+    onLogoutClick: () -> Unit,
+    productViewModel: ProductViewModel = viewModel(),
+    userViewModel: UserViewModel = viewModel(),
+    historyViewModel: HistoryViewModel = viewModel()
 ) {
+    // Observamos los datos para las estadísticas
+    val productList by productViewModel.productList.collectAsState()
+    val userList by userViewModel.userList.collectAsState()
+    val purchaseList by historyViewModel.purchaseList.collectAsState()
+
+    // Y Cargamos los datos al entrar
+    LaunchedEffect(Unit) {
+        productViewModel.loadProducts()
+        userViewModel.loadUsers()
+        historyViewModel.loadPurchaseHistory()
+    }
+
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
-    // Creación de la lista de datos para llenar el Dashboard.
-    val stats = listOf(
-        AdminStat("Inventario Total", "540", { Icon(painter = painterResource(R.drawable.inventario), contentDescription = null, tint = MonkiAmarillo) }),
-        AdminStat("Usuarios totales", "540", { Icon(painter = painterResource(R.drawable.usuario), contentDescription = null, tint = MonkiAmarillo) }),
-    )
+    // Colores MonkiBox
+    val monkiBackground = Color(0xFFEFEADC)
+    val monkiBrown = Color(0xFFA75A17)
+    val monkiYellow = Color(0xFFFBCC05)
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -155,115 +184,174 @@ fun AdminHomeScreen(
             }
         }
     ) {
-        // 4. CONTENIDO PRINCIPAL (Scaffold)
         Scaffold(
             topBar = {
                 TopAppBar(
-                    title = {
-                        Text(
-                            "Bienvenido Administrador",
-                            color = MonkiCafe,
-                            fontWeight = FontWeight.SemiBold
-                        )
-                    },
-                    //  Colores de la barra superior.
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = MonkiFondo,
-                        navigationIconContentColor = MonkiCafe
-                    ),
+                    title = { Text("Panel de Administración", color = monkiBrown, fontWeight = FontWeight.Bold) },
+                    colors = TopAppBarDefaults.topAppBarColors(containerColor = monkiBackground),
                     navigationIcon = {
-                        IconButton(onClick = {
-                            scope.launch { drawerState.open() }
-                        }) {
-                            Icon(Icons.Default.Menu, contentDescription = "Abrir menú")
+                        IconButton(onClick = { scope.launch { drawerState.open() } }) {
+                            Icon(Icons.Default.Menu, "Menú", tint = monkiBrown)
                         }
                     }
                 )
             },
-            containerColor = MonkiFondo
+            containerColor = monkiBackground // Color de fondo crema
         ) { paddingValues ->
 
-            // Contenido del Dashboard (en lugar del texto simple)
             Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues)
-                    .padding(horizontal = 16.dp),
+                    .padding(16.dp)
+                    .verticalScroll(rememberScrollState()), // Scroll por si acaso
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Spacer(modifier = Modifier.height(16.dp))
 
-                //  Título del Dashboard.
+                // --- SECCIÓN 1: ESTADÍSTICAS (Imagen 1) ---
                 Text(
                     text = "Resumen de MonkiBox",
-                    fontSize = 20.sp,
+                    style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
-                    color = MonkiCafe,
+                    color = Color.Black,
                     modifier = Modifier.align(Alignment.Start).padding(bottom = 16.dp)
                 )
 
-                // LazyVerticalGrid para mostrar estadísticas en un diseño de cuadrícula.
-                LazyVerticalGrid(
-                    columns = GridCells.Fixed(2), // Define 2 columnas por fila.
-                    contentPadding = PaddingValues(4.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    // Crea un StatCard por cada elemento en la lista 'stats'.
-                    items(stats.size) { index ->
-                        StatCard(stats[index])
-                    }
+                    // Tarjeta Productos
+                    StatCard(
+                        title = "TOTAL PRODUCTOS",
+                        count = productList.size.toString(),
+                        modifier = Modifier.weight(1f)
+                    )
+                    // Tarjeta Usuarios
+                    StatCard(
+                        title = "TOTAL USUARIOS",
+                        count = userList.size.toString(),
+                        modifier = Modifier.weight(1f)
+                    )
+                    // Tarjeta Ventas (Compras)
+                    StatCard(
+                        title = "TOTAL COMPRAS",
+                        count = purchaseList.size.toString(),
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(32.dp))
+
+                // --- SECCIÓN 2: ACCIONES RÁPIDAS (Imagen 2) ---
+                Text(
+                    text = "Acciones Rápidas",
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Black,
+                    modifier = Modifier.align(Alignment.Start).padding(bottom = 16.dp)
+                )
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    // Botón Gestionar Productos (Icono Inventario)
+                    QuickActionCard(
+                        title = "Inventario\nTotal", // Salto de línea para estilo
+                        icon = Icons.Default.Inventory,
+                        color = monkiYellow,
+                        iconColor = monkiBrown,
+                        onClick = onManageProductsClick,
+                        modifier = Modifier.weight(1f)
+                    )
+
+                    // Botón Gestionar Usuarios (Icono Persona)
+                    QuickActionCard(
+                        title = "Gestionar\nUsuarios",
+                        icon = Icons.Default.Group,
+                        color = monkiYellow, // Puedes cambiar a blanco si prefieres
+                        iconColor = monkiBrown,
+                        onClick = onManageUsersClick,
+                        modifier = Modifier.weight(1f)
+                    )
                 }
             }
         }
     }
 }
 
-// --- NUEVA IMPLEMENTACIÓN: FUNCIÓN COMPOSABLE PARA UNA TARJETA DE ESTADÍSTICA ---
+// --- COMPOSABLE: TARJETA DE ESTADÍSTICA (Blanca y limpia) ---
 @Composable
-fun StatCard(stat: AdminStat) {
+fun StatCard(title: String, count: String, modifier: Modifier = Modifier) {
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(120.dp),
-        // NUEVA IMPLEMENTACIÓN: Fondo de la tarjeta en Blanco puro para contraste.
-        colors = CardDefaults.cardColors(
-            containerColor = Color.White
-        ),
-        // NUEVA IMPLEMENTACIÓN: Sombra sutil para un diseño más elegante y tridimensional.
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        modifier = modifier.height(100.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(
-            modifier = Modifier
-                .padding(12.dp)
-                .fillMaxSize(),
-            verticalArrangement = Arrangement.SpaceBetween
+            modifier = Modifier.fillMaxSize().padding(8.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                stat.icon()
-                Spacer(modifier = Modifier.width(8.dp))
-                // Título de la estadística en Marrón.
-                Text(
-                    text = stat.title,
-                    color = MonkiCafe,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.SemiBold
-                )
-            }
-            // NUEVA IMPLEMENTACIÓN: El valor numérico se muestra grande y en MonkiYellow (acento).
             Text(
-                text = stat.value,
-                color = MonkiAmarillo,
-                fontSize = 28.sp,
-                fontWeight = FontWeight.ExtraBold
+                text = title,
+                style = MaterialTheme.typography.labelSmall,
+                color = Color.Gray,
+                textAlign = TextAlign.Center,
+                lineHeight = 12.sp
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = count,
+                style = MaterialTheme.typography.headlineMedium,
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFFA75A17) // Color Café Monki
             )
         }
     }
 }
 
-// --- PREVIEW ---
-@Preview(showBackground = true)
+// --- COMPOSABLE: BOTÓN DE ACCIÓN RÁPIDA (Estilo Imagen 2) ---
 @Composable
-fun PreviewAdminHomeScreen() {
-    AdminHomeScreen({}, {}, {})
+fun QuickActionCard(
+    title: String,
+    icon: ImageVector,
+    color: Color, // Color del borde o icono
+    iconColor: Color,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier
+            .height(120.dp)
+            .clickable { onClick() },
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        border = androidx.compose.foundation.BorderStroke(1.dp, color.copy(alpha = 0.5f))
+    ) {
+        Row(
+            modifier = Modifier.fillMaxSize().padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
+            // Icono grande a la izquierda (o arriba según diseño, aquí lo pongo al lado como tarjeta)
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = iconColor,
+                modifier = Modifier.size(48.dp)
+            )
+
+            Spacer(modifier = Modifier.width(16.dp))
+
+            // Texto
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = Color.Black
+            )
+        }
+    }
 }

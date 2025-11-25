@@ -1,7 +1,7 @@
 package com.example.monkibox.usuario
 import com.example.monkibox.R
-import com.example.monkibox.ProductViewModel
-import com.example.monkibox.admin.Product
+import com.example.monkibox.viewmodels.ProductViewModel
+import com.example.monkibox.dataclass.Product
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -23,13 +23,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 
 // import com.tuproyecto.R // (Asegúrate de tener R.drawable.mono)
@@ -79,7 +78,6 @@ fun ProductsScreen(
 }
 
 // --- NUEVO COMPOSABLE: La tarjeta de producto ---
-
 @Composable
 fun ProductCard(
     product: Product,
@@ -89,6 +87,9 @@ fun ProductCard(
         modifier = Modifier
             .fillMaxWidth()
             .clickable { onClick() }, // Hacemos la tarjeta clickeable
+        colors = CardDefaults.cardColors(
+            containerColor = Color(0xFFE7D8B8)
+        ),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column {

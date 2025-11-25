@@ -1,5 +1,5 @@
 package com.example.monkibox.usuario
-import com.example.monkibox.HistoryViewModel
+import com.example.monkibox.viewmodels.HistoryViewModel
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -20,6 +20,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.monkibox.dataclass.CartItem
+import com.example.monkibox.dataclass.Purchase
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -87,7 +89,10 @@ fun PurchaseItemCard(
         modifier = Modifier
             .fillMaxWidth()
             .clickable { onClick() }, // Hacemos toda la tarjeta clickeable
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Color(0xFFE7D8B8)
+        )
     ) {
         Row(
             modifier = Modifier
@@ -103,7 +108,7 @@ fun PurchaseItemCard(
                 Text(
                     text = "ID: ${purchase.id.substring(0, 8)}", // ID corto
                     fontSize = 12.sp,
-                    color = Color.Gray
+                    color = Color.DarkGray
                 )
                 Text(
                     text = "Cantidad: ${purchase.items.sumOf { it.quantity }} productos",
@@ -120,13 +125,13 @@ fun PurchaseItemCard(
                 Icon(
                     imageVector = Icons.Default.KeyboardArrowDown,
                     contentDescription = "Ver detalle",
-                    tint = MaterialTheme.colorScheme.primary
+                    tint = Color(0xFF000000)
                 )
                 Text(
                     text = "$${String.format("%.2f", purchase.total)}",
                     fontWeight = FontWeight.Bold,
                     fontSize = 18.sp,
-                    color = MaterialTheme.colorScheme.primary
+                    color = Color(0xFF000000)
                 )
             }
         }
@@ -151,7 +156,10 @@ fun PurchaseDetailDialog(
         Card(
             modifier = Modifier
                 .fillMaxWidth(0.95f) // 95% del ancho
-                .fillMaxHeight(0.85f) // 85% del alto
+                .fillMaxHeight(0.85f), // 85% del alto
+            colors = CardDefaults.cardColors(
+                containerColor = Color(0xFFE7D8B8)
+            )
         ) {
             Column {
                 // 1. Título y Botón de Cerrar

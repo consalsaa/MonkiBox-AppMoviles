@@ -1,7 +1,8 @@
-package com.example.monkibox.admin
+package com.example.monkibox.storage
 
 import android.content.Context
 import android.content.SharedPreferences
+import com.example.monkibox.dataclass.Product
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
@@ -69,7 +70,7 @@ object ProductStorage {
     fun deleteProduct(context: Context, productId: String) {
         val currentList = getAllProducts(context).toMutableList()
         // Removemos de la lista todos los que coincidan con ese ID
-        currentList.removeAll { it.id == productId }
+        currentList.removeAll { it.id.toString() == productId }
         saveProducts(context, currentList)
     }
 

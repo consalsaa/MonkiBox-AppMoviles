@@ -1,10 +1,10 @@
-package com.example.monkibox
-import com.example.monkibox.usuario.HistoryStorage
-import com.example.monkibox.usuario.Purchase
+package com.example.monkibox.viewmodels
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.monkibox.storage.HistoryStorage
+import com.example.monkibox.dataclass.Purchase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

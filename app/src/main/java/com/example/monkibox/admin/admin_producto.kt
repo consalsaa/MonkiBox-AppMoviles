@@ -1,7 +1,7 @@
 package com.example.monkibox.admin
 import androidx.compose.foundation.background
 import com.example.monkibox.R
-import com.example.monkibox.ProductViewModel
+import com.example.monkibox.viewmodels.ProductViewModel
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -22,13 +22,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.AlertDialogDefaults.containerColor
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import coil.compose.AsyncImage
-import kotlin.random.Random
+import com.example.monkibox.dataclass.Product
 
 
 // Usamos @OptIn para el Scaffold y TopAppBar
@@ -112,7 +111,7 @@ fun AdminProductsScreen(
                         product = product,
                         onEditClick = { productToEdit = product },
                         onDeleteClick = {
-                            viewModel.deleteProduct(product.id)
+                           // viewModel.deleteProduct(product.id.toString())
                         }
                     )
                 }
@@ -139,7 +138,7 @@ fun AdminProductsScreen(
             product = product,
             onDismiss = { productToEdit = null },
             onConfirm = { updatedProduct ->
-                viewModel.updateProduct(updatedProduct)
+               // viewModel.updateProduct(updatedProduct)
                 productToEdit = null
             }
         )
@@ -192,7 +191,7 @@ fun ProductListItem(
                 modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.Center
             ) {
-                Text(text = "ID: ${product.id}", fontSize = 12.sp, color = Color.Gray)
+                Text(text = "ID: ${product.id.toString()}", fontSize = 12.sp, color = Color.Gray)
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(text = product.name, fontSize = 18.sp, fontWeight = FontWeight.Bold)
                 Text(
@@ -419,8 +418,8 @@ fun AddProductDialog(
                         // Creamos un producto totalmente NUEVO
                         val newProduct = Product(
                             name = name,
-                            price = newPrice,
-                            stock = newStock,
+                            price = price.toDouble(),
+                            stock = stock.toInt(),
                             description = description,
                             imageUrl = imageUrl
                         )

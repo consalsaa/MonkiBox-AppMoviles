@@ -1,9 +1,9 @@
-package com.example.monkibox
-import com.example.monkibox.admin.Product
-import com.example.monkibox.usuario.CartItem
-import com.example.monkibox.usuario.Purchase
-import com.example.monkibox.usuario.HistoryStorage
-import com.example.monkibox.usuario.CartStorage
+package com.example.monkibox.viewmodels
+import com.example.monkibox.dataclass.Product
+import com.example.monkibox.dataclass.CartItem
+import com.example.monkibox.dataclass.Purchase
+import com.example.monkibox.storage.HistoryStorage
+import com.example.monkibox.storage.CartStorage
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel

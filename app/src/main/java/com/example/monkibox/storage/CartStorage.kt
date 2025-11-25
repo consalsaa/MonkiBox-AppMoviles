@@ -1,6 +1,7 @@
-package com.example.monkibox.usuario
+package com.example.monkibox.storage
 
 import android.content.Context
+import com.example.monkibox.dataclass.CartItem
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 

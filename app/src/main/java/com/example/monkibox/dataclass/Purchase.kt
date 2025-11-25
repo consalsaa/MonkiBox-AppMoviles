@@ -1,5 +1,6 @@
-package com.example.monkibox.usuario
+package com.example.monkibox.dataclass
 
+import com.example.monkibox.dataclass.CartItem
 import java.util.UUID
 
 data class Purchase(

@@ -1,4 +1,4 @@
-package com.example.monkibox.login
+package com.example.monkibox.storage
 
 import android.content.Context
 import android.content.SharedPreferences

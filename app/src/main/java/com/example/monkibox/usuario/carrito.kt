@@ -1,6 +1,6 @@
 package com.example.monkibox.usuario
-import com.example.monkibox.CartViewModel
-import com.example.monkibox.CartTotals
+import com.example.monkibox.viewmodels.CartViewModel
+import com.example.monkibox.viewmodels.CartTotals
 import com.example.monkibox.R
 
 import androidx.compose.foundation.layout.*
@@ -21,9 +21,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import android.widget.Toast
+import com.example.monkibox.dataclass.CartItem
 
 @Composable
 fun CartScreen(viewModel: CartViewModel) {
@@ -99,7 +99,10 @@ fun CartItemRow(
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Color(0xFFE7D8B8)
+        )
     ) {
         Row(
             modifier = Modifier.padding(8.dp),
@@ -135,7 +138,7 @@ fun CartItemRow(
                     onClick = onRemove,
                     modifier = Modifier.padding(0.dp)
                 ) {
-                    Text("Eliminar", color = MaterialTheme.colorScheme.primary)
+                    Text("Eliminar", color = Color(0xFF000000))
                 }
 
                 // Selector de cantidad (simplificado)

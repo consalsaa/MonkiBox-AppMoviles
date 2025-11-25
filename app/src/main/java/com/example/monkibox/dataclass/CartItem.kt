@@ -1,5 +1,4 @@
-package com.example.monkibox.usuario
-import com.example.monkibox.admin.Product
+package com.example.monkibox.dataclass
 
 import java.util.UUID
 
