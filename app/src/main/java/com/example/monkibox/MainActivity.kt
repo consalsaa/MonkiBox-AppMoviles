@@ -36,7 +36,6 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
-
 @Composable
 fun AppNavigation() {
     val navController = rememberNavController()
@@ -51,8 +50,13 @@ fun AppNavigation() {
     // Definimos las rutas
     val routeLogin = "login"
     val routeRegister = "register"
-    val routeUserHome = "main/{email}"
-    val routeAdminHome = "admin"
+
+    // Ahora aceptamos rol en el usuario también (para diferenciar Cliente de Invitado)
+    val routeUserHome = "main/{email}/{role}"
+
+    // Ahora aceptamos rol en el admin (para diferenciar Admin de Soporte)
+    val routeAdminHome = "admin/{role}"
+
     val routeAdminProducts = "admin_producto"
     val routeAdminUsers = "admin_usuarios"
 
@@ -62,28 +66,27 @@ fun AppNavigation() {
         when (val result = authState) {
             is UserViewModel.AuthResult.Success -> {
                 val user = result.user
-                Toast.makeText(context, "Bienvenido ${user.email}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Bienvenido ${user.email} (${user.role})", Toast.LENGTH_SHORT).show()
 
-                // Verificamos el ROL que viene de la Base de Datos (Spring Boot)
-                if (user.role == "ADMIN") {
-                    navController.navigate(routeAdminHome) {
+                if (user.role == "ADMIN" || user.role == "SUPPORT") {
+                    // Vamos al panel de Admin pasando el rol
+                    navController.navigate("admin/${user.role}") {
                         popUpTo(routeLogin) { inclusive = true }
                     }
                 } else {
-                    // Si es USER, vamos al home de usuario
-                    navController.navigate("main/${user.email}") {
+                    // USER o GUEST van al home de usuario
+                    // Si es guest, el email puede ser "invitado"
+                    navController.navigate("main/${user.email}/${user.role}") {
                         popUpTo(routeLogin) { inclusive = true }
                     }
                 }
-                // Limpiamos el estado para evitar re-navegación
                 userViewModel.clearAuthStatus()
             }
             is UserViewModel.AuthResult.Error -> {
-                // Si falló (contraseña mal, error de red, etc.)
                 Toast.makeText(context, result.message, Toast.LENGTH_SHORT).show()
                 userViewModel.clearAuthStatus()
             }
-            null -> { /* No hacemos nada mientras esperamos */ }
+            null -> { }
         }
     }
 
@@ -96,12 +99,13 @@ fun AppNavigation() {
         composable(route = routeLogin) {
             LoginScreen(
                 onLoginClick = { email, password ->
-                    // Llamamos al ViewModel.
-                    // Él hablará con Spring Boot.
                     userViewModel.login(email, password)
                 },
                 onRegisterClick = {
                     navController.navigate(routeRegister)
+                },
+                onGuestClick = { // <--- CONEXIÓN NUEVA
+                    userViewModel.loginAsGuest()
                 }
             )
         }
@@ -121,15 +125,20 @@ fun AppNavigation() {
             )
         }
 
-        // --- Ruta "main.kt" (Home del Usuario) ---
+        // --- Ruta Home del Usuario ---
         composable(
             route = routeUserHome,
-            arguments = listOf(navArgument("email") { type = NavType.StringType })
+            arguments = listOf(
+                navArgument("email") { type = NavType.StringType },
+                navArgument("role") { type = NavType.StringType }
+            )
         ) { backStackEntry ->
             val email = backStackEntry.arguments?.getString("email") ?: "Usuario"
+            val role = backStackEntry.arguments?.getString("role") ?: "USER"
 
             UserHomeScreen(
                 email = email,
+                userRole = role, // Necesitas actualizar UserHomeScreen para recibir esto
                 onLogoutClick = {
                     navController.navigate(routeLogin) {
                         popUpTo(navController.graph.id) { inclusive = true }
@@ -139,19 +148,22 @@ fun AppNavigation() {
         }
 
         // --- Ruta Home del Admin ---
-        composable(route = routeAdminHome) {
+        composable(
+            route = routeAdminHome,
+            arguments = listOf(navArgument("role") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val role = backStackEntry.arguments?.getString("role") ?: "ADMIN"
+
+            // Calculamos si tiene permiso total
+            val isAdmin = (role == "ADMIN")
+
             AdminHomeScreen(
-                onManageProductsClick = {
-                    navController.navigate(routeAdminProducts)
-                },
-                onManageUsersClick = {
-                    navController.navigate(routeAdminUsers)
-                },
+                isAdmin = isAdmin, // Pasamos el booleano
+                onManageProductsClick = { navController.navigate(routeAdminProducts) },
+                onManageUsersClick = { navController.navigate(routeAdminUsers) },
                 onLogoutClick = {
                     navController.navigate(routeLogin) {
-                        popUpTo(navController.graph.id) {
-                            inclusive = true
-                        }
+                        popUpTo(navController.graph.id) { inclusive = true }
                     }
                 }
             )

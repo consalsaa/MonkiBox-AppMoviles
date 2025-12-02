@@ -34,6 +34,7 @@ fun ProductDetailScreen(
     productId: String,
     viewModel: ProductViewModel, // (El VM de producto)
     cartViewModel: CartViewModel, // (El VM de carrito)
+    userRole: String,
     onBackClick: () -> Unit
 ) {
     // 1. Buscamos el producto en la lista del ViewModel usando el ID
@@ -160,17 +161,37 @@ fun ProductDetailScreen(
                     Spacer(modifier = Modifier.height(24.dp)) // Espacio antes del botón
 
                     // 7. Botón Verde "Agregar al Carrito"
-                    Button(
-                        onClick = {
-                            cartViewModel.addItem(product!!, quantity)
-                            Toast.makeText(context, "¡Añadido al carrito!", Toast.LENGTH_SHORT).show()
-                        },
-                        modifier = Modifier.fillMaxWidth().height(50.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFF4CAF50) // Tono verde
-                        )
-                    ) {
-                        Text("Agregar al Carrito", fontSize = 18.sp)
+                    if (userRole == "GUEST") {
+                        // Si es invitado, NO mostramos botón de compra
+                        Card(
+                            colors = CardDefaults.cardColors(containerColor = Color.LightGray.copy(alpha = 0.3f)),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text(
+                                text = "🔒 Regístrate o inicia sesión para comprar este producto.",
+                                modifier = Modifier.padding(16.dp),
+                                textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                                color = Color.DarkGray,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                    } else {
+                        // Si es USER o ADMIN o SUPPORT, puede agregar al carrito
+                        Button(
+                            onClick = {
+                                cartViewModel.addItem(product!!, quantity)
+                                Toast.makeText(context, "¡Añadido al carrito!", Toast.LENGTH_SHORT)
+                                    .show()
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(50.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(0xFF4CAF50)
+                            )
+                        ) {
+                            Text("Agregar al Carrito", fontSize = 18.sp)
+                        }
                     }
                 }
             }

@@ -56,10 +56,13 @@ val userTabs = listOf(
     UserScreen.More
 )
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun UserHomeScreen(email: String, onLogoutClick: () -> Unit) {
+fun UserHomeScreen(
+    email: String,
+    userRole: String,
+    onLogoutClick: () -> Unit
+) {
 
     // Creamos un NUEVO NavController para las pestañas
     val tabNavController = rememberNavController()
@@ -159,11 +162,10 @@ fun UserHomeScreen(email: String, onLogoutClick: () -> Unit) {
                     // PASAMOS AMBAS INSTANCIAS AL DETALLE
                     ProductDetailScreen(
                         productId = productId,
-                        viewModel = productViewModel,  // Pasa el VM de producto
-                        cartViewModel = cartViewModel, // Pasa el VM de carrito
-                        onBackClick = {
-                            tabNavController.popBackStack()
-                        }
+                        viewModel = productViewModel,
+                        cartViewModel = cartViewModel,
+                        userRole = userRole,
+                        onBackClick = { tabNavController.popBackStack() }
                     )
                 } else {
                     Text("Error: ID de producto no encontrado")

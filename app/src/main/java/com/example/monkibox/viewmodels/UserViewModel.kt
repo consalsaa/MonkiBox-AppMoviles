@@ -93,4 +93,16 @@ class UserViewModel(application: Application) : AndroidViewModel(application) {
             }
         }
     }
+
+    // C. LOGIN DE INVITADO (Sin backend)
+    fun loginAsGuest() {
+        // Creamos un usuario temporal en memoria
+        val guestUser = User(
+            id = -1, // ID negativo para identificarlo
+            email = "invitado@monkibox.com",
+            password = "",
+            role = "GUEST" // Rol nuevo
+        )
+        _authStatus.value = AuthResult.Success(guestUser)
+    }
 }

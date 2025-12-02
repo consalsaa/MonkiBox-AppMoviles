@@ -39,7 +39,8 @@ import com.example.monkibox.R
 @Composable
 fun LoginScreen(
     onLoginClick: (String, String) -> Unit,
-    onRegisterClick: () -> Unit
+    onRegisterClick: () -> Unit,
+    onGuestClick: () -> Unit
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -128,6 +129,16 @@ fun LoginScreen(
         ) {
             Text("Crear nueva cuenta")
         }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // BOTÓN DE INVITADO (NUEVO)
+        TextButton(
+            onClick = { onGuestClick() },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Continuar como Invitado (Solo ver)", color = Color.Gray)
+        }
     }
 }
 
@@ -135,5 +146,5 @@ fun LoginScreen(
 @Preview(showBackground = true)
 @Composable
 fun LoginScreenPreview() {
-    LoginScreen(onLoginClick = { _, _ -> }, onRegisterClick = {})
+    LoginScreen(onLoginClick = { _, _ -> }, onRegisterClick = {}, onGuestClick = {})
 }

@@ -57,6 +57,7 @@ data class AdminStat(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AdminHomeScreen(
+    isAdmin: Boolean, // <--- AÑADE ESTE PARÁMETRO AL PRINCIPIO
     onManageProductsClick: () -> Unit,
     onManageUsersClick: () -> Unit,
     onLogoutClick: () -> Unit,
@@ -258,11 +259,17 @@ fun AdminHomeScreen(
                 ) {
                     // Botón Gestionar Productos (Icono Inventario)
                     QuickActionCard(
-                        title = "Inventario\nTotal", // Salto de línea para estilo
+                        title = "Gestionar\nProductos", // Salto de línea para estilo
                         icon = Icons.Default.Inventory,
                         color = monkiYellow,
-                        iconColor = monkiBrown,
-                        onClick = onManageProductsClick,
+                        iconColor = if (isAdmin) monkiBrown else Color.Gray, // Gris si no es admin
+                        onClick = {
+                            if (isAdmin) {
+                                onManageProductsClick()
+                            } else {
+
+                            }
+                        },
                         modifier = Modifier.weight(1f)
                     )
 
